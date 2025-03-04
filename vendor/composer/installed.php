@@ -3,7 +3,9 @@
         'name' => 'laravel/laravel',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
+
         'reference' => '8204ca1d8fe5fb0384dddc86dfc3a7f182ea96cf',
+
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -388,7 +390,9 @@
         'laravel/laravel' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
+
             'reference' => '8204ca1d8fe5fb0384dddc86dfc3a7f182ea96cf',
+
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -464,7 +468,10 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../laravel/ui',
             'aliases' => array(),
+
             'dev_requirement' => true,
+
+
         ),
         'league/commonmark' => array(
             'pretty_version' => '2.6.1',
