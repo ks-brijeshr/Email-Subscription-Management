@@ -11,6 +11,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\SubscriberController;
 use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\CustomEmailController;
 use App\Http\Controllers\EmailTemplateController;
 use App\Http\Controllers\UnsubscribeController;
@@ -219,7 +220,7 @@ Route::post('/subscriptions/{list_id}/import', [SubscriberController::class, 'im
 
 
 //userside subscriber add
-Route::post('/subscribe', [NewsletterController::class, 'subscribe']);
+Route::post('/subscribe', [NewsletterController::class, 'subscribe']); 
 
 
 
@@ -239,3 +240,11 @@ Route::middleware('auth:sanctum')->post('/send-template', [sendTemplateToSubscri
 
 Route::middleware('auth:sanctum')->get('/notifications', [NotificationController::class, 'index']);
 Route::middleware('auth:sanctum')->put('/notifications/mark-as-read', [NotificationController::class, 'markAllAsRead']);
+
+
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/campaigns', [CampaignController::class, 'store']);
+});
+
+

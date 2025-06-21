@@ -59,7 +59,7 @@ const SendMailPage = () => {
     }
   };
 
-  const updateTemplateBeforeSend = async () => {
+  const updateTemplateBeforeCampaign = async () => {
     if (!selectedTemplateId) return;
     try {
       await axios.put(`${apiConfig.apiUrl}/email-templates/${selectedTemplateId}`, {
@@ -67,18 +67,13 @@ const SendMailPage = () => {
         body: htmlMessage,
       });
     } catch (error) {
-      console.error("Error updating template before sending:", error);
+      console.error("Error updating template:", error);
     }
   };
 
-  const handleSendEmail = async () => {
+  const handleCreateCampaign = async () => {
     if (!selectedListId) {
       alert("Please select a subscription list.");
-      return;
-    }
-
-    if (!selectedTemplateId) {
-      alert("Please select a template.");
       return;
     }
 
@@ -88,16 +83,25 @@ const SendMailPage = () => {
     }
 
     try {
-      await updateTemplateBeforeSend();
+      // Update the template if selected
+      if (selectedTemplateId) {
+        await updateTemplateBeforeCampaign();
+      }
 
-      await axios.post(`${apiConfig.apiUrl}/send-template`, {
-        subscription_list_id: parseInt(selectedListId),
-        template_id: parseInt(selectedTemplateId),
+      const payload: any = {
+        subscription_list_ids: [parseInt(selectedListId)],
+        title: subject,
         subject,
         body: htmlMessage,
-      });
+      };
 
-      alert("Emails sent successfully!");
+      if (selectedTemplateId) {
+        payload.template_id = parseInt(selectedTemplateId);
+      }
+
+      await axios.post(`${apiConfig.apiUrl}/campaigns`, payload);
+
+      alert("Campaign created successfully!");
       setSelectedListId("");
       setSelectedTemplateId("");
       setSubject("");
@@ -107,12 +111,12 @@ const SendMailPage = () => {
       }
       navigate("/admin/dashboard");
     } catch (error: any) {
-      console.error("Error sending email:", error);
+      console.error("Error creating campaign:", error);
       if (error.response?.data?.errors) {
         const errorMsgs = Object.values(error.response.data.errors).flat().join("\n");
         alert(`Validation failed:\n${errorMsgs}`);
       } else {
-        alert("Failed to send emails. Please check your inputs.");
+        alert("Failed to create campaign. Please check your inputs.");
       }
     }
   };
@@ -134,7 +138,7 @@ const SendMailPage = () => {
                 </svg>
               </button>
             )}
-            <h1 className="text-xl lg:text-2xl font-bold text-blue-600">Send Emails to Subscribers</h1>
+            <h1 className="text-xl lg:text-2xl font-bold text-blue-600">Create Campaign for Subscribers</h1>
           </div>
           <a
             href="/admin/dashboard"
@@ -149,7 +153,7 @@ const SendMailPage = () => {
 
         <div className="mt-6 max-w-4xl mx-auto">
           <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-200">
-            <h2 className="text-2xl font-semibold text-blue-600 mb-8 text-center">📧 Send Email to Subscribers</h2>
+            <h2 className="text-2xl font-semibold text-blue-600 mb-8 text-center">📢 Create Email Campaign</h2>
 
             {/* Subscription List */}
             <div className="mb-6">
@@ -168,6 +172,7 @@ const SendMailPage = () => {
               </select>
             </div>
 
+            {/* Email Template */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">Choose Template</label>
               <select
@@ -184,6 +189,7 @@ const SendMailPage = () => {
               </select>
             </div>
 
+            {/* Subject */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">Subject</label>
               <input
@@ -195,6 +201,7 @@ const SendMailPage = () => {
               />
             </div>
 
+            {/* Message */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">Message</label>
               <div
@@ -204,10 +211,11 @@ const SendMailPage = () => {
                 onInput={(e) => setHtmlMessage(e.currentTarget.innerHTML)}
               />
               <p className="text-xs text-gray-500 mt-2">
-                You can use placeholders like <code>{`{{name}}`}</code> and <code>{`{{unsubscribe_link}}`}</code>.
+                You can use placeholders like <code>{`{{name}}`}</code>, <code>{`{{unsubscribe_link}}`}</code>.
               </p>
             </div>
 
+            {/* Preview */}
             {htmlMessage && (
               <div className="mb-8">
                 <label className="block text-sm font-medium text-gray-700 mb-2">Live Preview</label>
@@ -218,11 +226,12 @@ const SendMailPage = () => {
               </div>
             )}
 
+            {/* Create Campaign Button */}
             <button
-              onClick={handleSendEmail}
-              className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-500 transition"
+              onClick={handleCreateCampaign}
+              className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-500 transition"
             >
-              Send Email
+              Create Campaign
             </button>
           </div>
         </div>
