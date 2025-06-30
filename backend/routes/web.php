@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UnsubscribeController;
@@ -29,9 +30,16 @@ Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
 
 
 Route::get('/run-artisan', function () {
+    // Generate cache table migration file (only if it doesn't exist)
+    if (!Schema::hasTable('cache')) {
+        Artisan::call('cache:table');
+        Artisan::call('migrate', ['--force' => true]);
+    }
+
     Artisan::call('config:clear');
     Artisan::call('cache:clear');
     Artisan::call('config:cache');
     Artisan::call('migrate', ['--force' => true]);
+
     return 'All artisan commands ran successfully!';
 });
