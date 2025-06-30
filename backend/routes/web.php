@@ -1,7 +1,8 @@
 <?php
 
-use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UnsubscribeController;
 
 Route::get('/', function () {
@@ -22,3 +23,15 @@ Route::get('/unsubscribe/success', [UnsubscribeController::class, 'unsubscribeSu
 
 Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
     ->name('verification.verify');
+
+
+
+
+
+Route::get('/run-artisan', function () {
+    Artisan::call('config:clear');
+    Artisan::call('cache:clear');
+    Artisan::call('config:cache');
+    Artisan::call('migrate', ['--force' => true]);
+    return 'All artisan commands ran successfully!';
+});
