@@ -3,6 +3,10 @@
     {
       "source": "/api/:match*",
       "destination": "https://email-subscription-management.onrender.com/api/:match*"
+    },
+    {
+      "source": "/:path*",
+      "destination": "/index.html"
     }
   ],
   "redirects": [],
