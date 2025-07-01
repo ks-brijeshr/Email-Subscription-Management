@@ -1,0 +1,11 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:match*",
+      "destination": "https://your-backend.onrender.com/api/:match*"
+    }
+  ],
+  "redirects": [],
+  "headers": [],
+  "cleanUrls": true
+}
