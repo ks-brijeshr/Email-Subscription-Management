@@ -1,15 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/api/:match*",
-      "destination": "https://email-subscription-management.onrender.com/api/:match*"
-    },
-    {
-      "source": "/:path*",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
-  ],
-  "redirects": [],
-  "headers": [],
-  "cleanUrls": true
+  ]
 }
