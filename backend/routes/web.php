@@ -30,20 +30,26 @@ Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
 
 
 Route::get('/run-artisan', function () {
-    // Just to be safe
+    // Step 1: Create cache table if missing
     if (!Schema::hasTable('cache')) {
         Artisan::call('cache:table');
         Artisan::call('migrate', ['--force' => true]);
     }
 
+    // Step 2: Clear and cache config
     Artisan::call('config:clear');
     Artisan::call('cache:clear');
     Artisan::call('config:cache');
 
-    // Check for duplicate column
+    // Step 3: Run migration safely
     if (!Schema::hasColumn('subscribers', 'unsubscribe_token')) {
         Artisan::call('migrate', ['--force' => true]);
     }
 
-    return 'All artisan commands ran successfully!';
+    // Step 4: Run one job from queue
+    Artisan::call('queue:work', [
+        '--once' => true
+    ]);
+
+    return 'All artisan + queue worker (once) ran successfully!';
 });
