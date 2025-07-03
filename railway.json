@@ -1,7 +1,7 @@
 {
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "cd backend && composer install --no-dev --optimize-autoloader && php artisan config:cache",
-    "startCommand": "cd backend && php artisan queue:work --sleep=3 --tries=3 --timeout=90"
+    "buildCommand": "composer install --no-dev --optimize-autoloader && php artisan config:cache",
+    "startCommand": "php artisan queue:work --sleep=3 --tries=3 --timeout=90"
   }
 }
