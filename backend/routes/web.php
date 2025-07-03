@@ -30,7 +30,7 @@ Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
 
 
 Route::get('/run-artisan', function () {
-    // Generate cache table migration file (only if it doesn't exist)
+    // Just to be safe
     if (!Schema::hasTable('cache')) {
         Artisan::call('cache:table');
         Artisan::call('migrate', ['--force' => true]);
@@ -39,7 +39,11 @@ Route::get('/run-artisan', function () {
     Artisan::call('config:clear');
     Artisan::call('cache:clear');
     Artisan::call('config:cache');
-    Artisan::call('migrate', ['--force' => true]);
+
+    // Check for duplicate column
+    if (!Schema::hasColumn('subscribers', 'unsubscribe_token')) {
+        Artisan::call('migrate', ['--force' => true]);
+    }
 
     return 'All artisan commands ran successfully!';
 });
