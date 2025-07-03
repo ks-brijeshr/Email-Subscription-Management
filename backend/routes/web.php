@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Artisan;
@@ -52,4 +53,12 @@ Route::get('/run-artisan', function () {
     ]);
 
     return 'All artisan + queue worker (once) ran successfully!';
+});
+
+
+Route::get('/queue-status', function () {
+    return [
+        'pending_jobs' => DB::table('jobs')->count(),
+        'failed_jobs' => DB::table('failed_jobs')->count(),
+    ];
 });
