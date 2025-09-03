@@ -36,16 +36,17 @@ class AuthController extends Controller
      */
     public function register(RegisterRequest $request): JsonResponse
     {
-
         $data = $request->validated();
 
         $data['is_owner'] = filter_var($request->input('is_owner', false), FILTER_VALIDATE_BOOLEAN);
 
+        // Register user and clone default email templates
         $user = $this->authService->register($data);
 
+        // Log the user in
         Auth::login($user);
 
-
+        // Log registration activity
         $this->activityLogService->logActivity('User registered', $request);
 
         // Return JSON response
@@ -56,6 +57,7 @@ class AuthController extends Controller
             'user' => $user
         ], 201);
     }
+
 
 
 

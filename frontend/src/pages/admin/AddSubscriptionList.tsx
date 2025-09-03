@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Sidebar from "../../components/admin/Sidebar";
+import apiConfig from "../../api-config";
+
 
 const AddSubscriptionList = () => {
     const [name, setName] = useState<string>("");
@@ -29,16 +31,16 @@ const AddSubscriptionList = () => {
 
         try {
             const response = await axios.post(
-                "http://localhost:8000/api/subscription-list/create",
-                {
-                    name,
-                    allow_business_email_only: allowBusinessEmailOnly,
-                    block_temporary_email: blockTemporaryEmail,
-                    require_email_verification: requireEmailVerification,
-                    check_domain_existence: checkDomainExistence,
-                    verify_dns_records: verifyDnsRecords,
-                },
-                { headers: { Authorization: `Bearer ${token}` } }
+              `${apiConfig.apiUrl}/subscription-list/create`,
+              {
+                name,
+                allow_business_email_only: allowBusinessEmailOnly,
+                block_temporary_email: blockTemporaryEmail,
+                require_email_verification: requireEmailVerification,
+                check_domain_existence: checkDomainExistence,
+                verify_dns_records: verifyDnsRecords,
+              },
+              { headers: { Authorization: `Bearer ${token}` } }
             );
 
             console.log("Subscription List Created Successfully:", response.data);

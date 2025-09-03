@@ -61,8 +61,8 @@ const Home = () => {
             alt="Logo"
             className="w-10 h-10 object-contain"
           />
-          <h1 className="text-3xl font-bold tracking-wide hover:text-blue-500 transition duration-300">
-            <span className="text-blue-500">Email</span> Manager
+          <h1 className="text-2xl font-bold tracking-wide hover:text-blue-500 transition duration-300">
+            <span className="text-blue-500">Email</span> Subscription Management
           </h1>
         </div>
 
@@ -149,18 +149,18 @@ const Home = () => {
           {[
             {
               title: "Powerful bulk email tool",
-              icon: "automation.svg",
+              icon: "bulk-emails.svg",
               desc: "Schedule and trigger emails to subscribers based on tags and activity.",
             },
             {
               title: "Track Subscribers growth",
-              icon: "tracking.svg",
+              icon: "Track-subscriber.svg",
               desc: "Monitor subscriber growth and keep your list clean effortlessly.",
             },
             {
               title: "Secure & Compliant",
-              icon: "security.svg",
-              desc: "Built-in encryption, Google reCAPTCHA, and compliance monitoring.",
+              icon: "secure.svg",
+              desc: "Rate-limit, Security & compliance monitoring.",
             },
           ].map((f, idx) => (
             <div

@@ -23,4 +23,8 @@ class EmailBlacklist extends Model
     {
         return $this->belongsTo(\App\Models\SubscriptionList::class, 'subscription_list_id');
     }
+    public function subscriber()
+    {
+        return $this->belongsTo(Subscriber::class);
+    }
 }

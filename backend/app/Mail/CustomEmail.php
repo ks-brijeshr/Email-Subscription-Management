@@ -12,23 +12,20 @@ class CustomEmail extends Mailable
 
     public $subjectText;
     public $bodyText;
-    public $unsubscribeLink;
+    public $fromEmail;
 
-    public function __construct($subjectText, $bodyText, $fromEmail, $unsubscribeLink)
+    public function __construct($subjectText, $bodyText, $fromEmail)
     {
         $this->subjectText = $subjectText;
         $this->bodyText = $bodyText;
-        $this->unsubscribeLink = $unsubscribeLink;
-        $this->from($fromEmail);
+        $this->fromEmail = $fromEmail;
     }
 
     public function build()
     {
-        return $this->view('emails.custom')
+        return $this
+            ->from($this->fromEmail)
             ->subject($this->subjectText)
-            ->with([
-                'bodyText' => $this->bodyText,
-                'unsubscribeLink' => $this->unsubscribeLink
-            ]);
+            ->html($this->bodyText); 
     }
 }

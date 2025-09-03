@@ -15,46 +15,72 @@ class DashboardController extends Controller
 {
     public function getStats(Request $request)
     {
-        $ownerId = $request->user()->id;
-        $listId = $request->query('subscription_list_id'); // Get selected list
+        try {
+            $ownerId = $request->user()->id;
+            $listId = $request->query('subscription_list_id');
 
-        $subscriptionListIds = SubscriptionList::where('user_id', $ownerId)
-            ->when($listId, fn($q) => $q->where('id', $listId))
-            ->pluck('id');
+            $subscriptionListIds = SubscriptionList::where('user_id', $ownerId)
+                ->when($listId, fn($q) => $q->where('id', $listId))
+                ->pluck('id');
 
-        return response()->json([
-            'totalSubscribers' => Subscriber::whereIn('list_id', $subscriptionListIds)->count(),
-            'totalBlacklisted' => EmailBlacklist::where('blacklisted_by', $ownerId)->count(),
-            'totalSubscriptionLists' => $subscriptionListIds->count(),
-            'totalEmailVerifications' => EmailVerificationLog::where('user_id', $ownerId)->count(),
-            'totalActivityLogs' => ActivityLog::where('user_id', $ownerId)->count(),
-        ], 200);
+            // Filter blacklisted emails by subscription list
+            $blacklistedEmails = EmailBlacklist::where('blacklisted_by', $ownerId)
+                ->whereIn('subscription_list_id', $subscriptionListIds)
+                ->count();
+
+            return response()->json([
+                'totalSubscribers' => Subscriber::whereIn('list_id', $subscriptionListIds)->count(),
+                'totalBlacklisted' => $blacklistedEmails,
+                'totalSubscriptionLists' => $subscriptionListIds->count(),
+                'totalEmailVerifications' => EmailVerificationLog::where('user_id', $ownerId)->count(),
+                'totalActivityLogs' => ActivityLog::where('user_id', $ownerId)->count(),
+            ], 200);
+        } catch (\Throwable $e) {
+            Log::error('getStats error: ' . $e->getMessage());
+            return response()->json(['error' => 'Unable to fetch stats'], 500);
+        }
     }
+
 
     public function dashboardStats(Request $request)
     {
-        $ownerId = $request->user()->id;
-        $listId = $request->query('subscription_list_id');
+        try {
+            $ownerId = $request->user()->id;
+            $listId = $request->query('subscription_list_id');
 
-        $subscriptionListIds = SubscriptionList::where('user_id', $ownerId)
-            ->when($listId, fn($q) => $q->where('id', $listId))
-            ->pluck('id');
+            $subscriptionListIds = SubscriptionList::where('user_id', $ownerId)
+                ->when($listId, fn($q) => $q->where('id', $listId))
+                ->pluck('id');
 
-        return response()->json([
-            'totalSubscribers' => Subscriber::whereIn('list_id', $subscriptionListIds)->count(),
-            'subscriptionListsCount' => $subscriptionListIds->count(),
-            'recentSubscriptions' => Subscriber::whereIn('list_id', $subscriptionListIds)->latest()->take(5)->get(),
-            'emailVerificationStatus' => [
-                'verified' => Subscriber::whereIn('list_id', $subscriptionListIds)->whereNotNull('email_verified_at')->count(),
-                'pending' => Subscriber::whereIn('list_id', $subscriptionListIds)->whereNull('email_verified_at')->count(),
-            ],
-            'blacklistedEmails' => EmailBlacklist::where('blacklisted_by', $ownerId)->count(),
-            'adminActivityLogs' => ActivityLog::where('user_id', $ownerId)
-                ->when($listId, fn($q) => $q->where('list_id', $listId))
-                ->latest()->take(5)->get(),
-            'graphData' => $this->getSubscriberGrowthData($ownerId, $subscriptionListIds),
-        ], 200);
+            // Filter blacklisted emails by subscription list
+            $blacklistedEmails = EmailBlacklist::where('blacklisted_by', $ownerId)
+                ->whereIn('subscription_list_id', $subscriptionListIds)
+                ->count();
+
+            return response()->json([
+                'totalSubscribers' => Subscriber::whereIn('list_id', $subscriptionListIds)->count(),
+                'subscriptionListsCount' => $subscriptionListIds->count(),
+                'recentSubscriptions' => Subscriber::whereIn('list_id', $subscriptionListIds)
+                    ->latest()->take(5)->get(),
+                'emailVerificationStatus' => [
+                    'verified' => Subscriber::whereIn('list_id', $subscriptionListIds)
+                        ->whereNotNull('email_verified_at')->count(),
+                    'pending' => Subscriber::whereIn('list_id', $subscriptionListIds)
+                        ->whereNull('email_verified_at')->count(),
+                ],
+                'blacklistedEmails' => $blacklistedEmails,
+                'adminActivityLogs' => ActivityLog::where('user_id', $ownerId)
+                    ->when($listId, fn($q) => $q->where('list_id', $listId))
+                    ->latest()->take(5)->get(),
+                'graphData' => $this->getSubscriberGrowthData($ownerId, $subscriptionListIds),
+            ], 200);
+        } catch (\Throwable $e) {
+            Log::error('dashboardStats error: ' . $e->getMessage());
+            return response()->json(['error' => 'Unable to fetch dashboard stats'], 500);
+        }
     }
+
+
 
     public function getSubscriberGrowthData($ownerId, $subscriptionListIds)
     {

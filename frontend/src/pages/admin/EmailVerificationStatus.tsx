@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import apiConfig from "../../api-config";
 
 const EmailVerificationStatus = () => {
   const [stats, setStats] = useState({ total_verified: 0, total_failed: 0 });
@@ -16,11 +17,14 @@ const EmailVerificationStatus = () => {
           return;
         }
 
-        const response = await axios.get("http://localhost:8000/api/email-verification-stats", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.get(
+          `${apiConfig.apiUrl}/email-verification-stats`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         setStats(response.data);
       } catch (err) {
@@ -35,14 +39,19 @@ const EmailVerificationStatus = () => {
   }, []);
 
   const total = stats.total_verified + stats.total_failed;
-  const verifiedPercentage = total > 0 ? (stats.total_verified / total) * 100 : 0;
+  const verifiedPercentage =
+    total > 0 ? (stats.total_verified / total) * 100 : 0;
 
   return (
     <div className="bg-gray-50 border border-gray-200 rounded-md p-4 shadow-sm w-full max-w-md">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center space-x-2">
-          <div className="bg-blue-100 text-blue-600 text-sm font-bold px-2 py-1 rounded">📧</div>
-          <h3 className="text-base font-semibold text-gray-800">Email Verification</h3>
+          <div className="bg-blue-100 text-blue-600 text-sm font-bold px-2 py-1 rounded">
+            📧
+          </div>
+          <h3 className="text-base font-semibold text-gray-800">
+            Email Verification
+          </h3>
         </div>
         <span className="text-xs text-gray-500 italic">
           {verifiedPercentage.toFixed(1)}% Verified

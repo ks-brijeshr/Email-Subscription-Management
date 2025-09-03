@@ -6,6 +6,8 @@ use App\Services\NewsletterService;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\UserSubscribeRequest;
 use App\Http\Resources\UserSubscriberResource;
+use App\Models\Notification;
+use Illuminate\Support\Facades\Auth;
 
 class NewsletterController extends Controller
 {
@@ -15,6 +17,7 @@ class NewsletterController extends Controller
     {
         $this->newsletterService = $newsletterService;
     }
+
 
     public function subscribe(UserSubscribeRequest $request)
     {
@@ -33,6 +36,14 @@ class NewsletterController extends Controller
             if (isset($result['error'])) {
                 return response()->json(['message' => $result['error']], $result['status']);
             }
+
+            // Create Notification
+            Notification::create([
+                'title' => 'New Subscriber',
+                'message' => 'A new subscriber (' . $request->email . ') has joined.',
+                'read' => false,
+                'user_id' => Auth::id() ?? 1, // or the admin/owner id if available
+            ]);
 
             return response()->json([
                 'success' => true,

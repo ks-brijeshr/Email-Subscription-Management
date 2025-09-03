@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "../../components/admin/Sidebar";
+import apiConfig from "../../api-config";
 
 interface SubscriptionList {
   id: string;
@@ -9,7 +9,9 @@ interface SubscriptionList {
 }
 
 const AddSubscriber = () => {
-  const [subscriptionLists, setSubscriptionLists] = useState<SubscriptionList[]>([]);
+  const [subscriptionLists, setSubscriptionLists] = useState<
+    SubscriptionList[]
+  >([]);
   const [selectedList, setSelectedList] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
@@ -24,9 +26,12 @@ const AddSubscriber = () => {
         const token = localStorage.getItem("token");
         if (!token) return;
 
-        const response = await axios.get("http://localhost:8000/api/subscription-lists", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await axios.get(
+          `${apiConfig.apiUrl}/subscription-lists`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
 
         if (response.data.subscription_lists) {
           setSubscriptionLists(response.data.subscription_lists);
@@ -46,10 +51,10 @@ const AddSubscriber = () => {
       return;
     }
     setLoading(true); // Show loading state
-  
+
     try {
       const token = localStorage.getItem("token");
-  
+
       // Convert metadata from "key: value" format to JSON
       let formattedMetadata: Record<string, string> = {};
       if (metadata) {
@@ -60,33 +65,45 @@ const AddSubscriber = () => {
           }
         });
       }
-  
-      console.log("Submitting Data:", { name, email, metadata: formattedMetadata, list_id: selectedList });
-  
+
+      console.log("Submitting Data:", {
+        name,
+        email,
+        metadata: formattedMetadata,
+        list_id: selectedList,
+      });
+
       const response = await axios.post(
-        `http://localhost:8000/api/subscriptions/${selectedList}/subscribers`,
+        `${apiConfig.apiUrl}}/api/subscriptions/${selectedList}/subscribers`,
         {
           name,
           email,
           metadata: formattedMetadata,
-          subscription_list_id: selectedList 
+          subscription_list_id: selectedList,
         },
         {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
-  
+
       console.log("Subscriber Added Successfully:", response.data);
       alert("Subscriber added successfully!");
       navigate("/admin/dashboard");
     } catch (error: any) {
-      console.error("Error adding subscriber:", error.response?.data || error.message);
-      alert(`Failed to add subscriber: ${error.response?.data?.message || error.message}`);
+      console.error(
+        "Error adding subscriber:",
+        error.response?.data || error.message
+      );
+      alert(
+        `Failed to add subscriber: ${
+          error.response?.data?.message || error.message
+        }`
+      );
     } finally {
       setLoading(false); // Hide loading state
     }
   };
-  
+
   return (
     <div className="flex">
       {/* <Sidebar setIsSidebarOpen={() => { }} /> */}
@@ -94,16 +111,22 @@ const AddSubscriber = () => {
       <main className="w-full transition-all duration-300 ml-64">
         <nav className="bg-gray-900 border-b border-gray-200 px-6 py-4 flex justify-between items-center shadow-sm">
           <div className="flex items-center space-x-4">
-            <h1 className="text-2xl font-semibold text-white">Add Subscriber</h1>
+            <h1 className="text-2xl font-semibold text-white">
+              Add Subscriber
+            </h1>
           </div>
-          <a href="/admin/dashboard" className="text-white transition item-center ml-auto">Dashboard</a>
+          <a
+            href="/admin/dashboard"
+            className="text-white transition item-center ml-auto"
+          >
+            Dashboard
+          </a>
         </nav>
 
         {/* Centering the form */}
 
         <div className="flex justify-center items-center p-6 bg-gray-50 min-h-screen">
           <div className="w-full max-w-3xl bg-white border border-gray-300 rounded-2xl shadow-xl p-8 relative">
-
             {/* Back Button */}
             <button
               onClick={() => navigate("/admin/dashboard")}
@@ -119,7 +142,9 @@ const AddSubscriber = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Subscription List Dropdown */}
               <div>
-                <label className="block text-m font-medium text-gray-700 mb-3">Subscription List</label>
+                <label className="block text-m font-medium text-gray-700 mb-3">
+                  Subscription List
+                </label>
                 <select
                   value={selectedList}
                   onChange={(e) => setSelectedList(e.target.value)}
@@ -137,7 +162,9 @@ const AddSubscriber = () => {
 
               {/* Name Input */}
               <div>
-                <label className="block text-m font-medium text-gray-700 mb-3">Name</label>
+                <label className="block text-m font-medium text-gray-700 mb-3">
+                  Name
+                </label>
                 <input
                   type="text"
                   placeholder="Name (Optional)"
@@ -149,7 +176,9 @@ const AddSubscriber = () => {
 
               {/* Email Input */}
               <div>
-                <label className="block text-m font-medium text-gray-700 mb-3">Email</label>
+                <label className="block text-m font-medium text-gray-700 mb-3">
+                  Email
+                </label>
                 <input
                   type="email"
                   placeholder="Enter Email"
@@ -162,7 +191,9 @@ const AddSubscriber = () => {
 
               {/* Metadata Input */}
               <div>
-                <label className="block text-m font-medium text-gray-700 mb-3">Metadata</label>
+                <label className="block text-m font-medium text-gray-700 mb-3">
+                  Metadata
+                </label>
                 <input
                   type="text"
                   placeholder="e.g. city: Surat, role: Admin"
@@ -170,24 +201,24 @@ const AddSubscriber = () => {
                   onChange={(e) => setMetadata(e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:border-transparent"
                 />
-                <small className="text-gray-500 block mt-2">Use format: <i>key: value, key: value</i></small>
+                <small className="text-gray-500 block mt-2">
+                  Use format: <i>key: value, key: value</i>
+                </small>
               </div>
 
               {/* Submit Button */}
               <button
                 type="submit"
-                className={`w-full py-3 px-4 rounded-lg bg-gray-900 text-white font-medium hover:bg-gray-800 transition duration-300 ease-in-out shadow-sm hover:shadow-md ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`w-full py-3 px-4 rounded-lg bg-gray-900 text-white font-medium hover:bg-gray-800 transition duration-300 ease-in-out shadow-sm hover:shadow-md ${
+                  loading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
                 disabled={loading}
               >
-                {loading ? 'Adding...' : 'Add Subscriber'}
+                {loading ? "Adding..." : "Add Subscriber"}
               </button>
             </form>
           </div>
         </div>
-
-
-
-
       </main>
     </div>
   );

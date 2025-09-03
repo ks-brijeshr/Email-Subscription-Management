@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Sidebar from "../../components/admin/Sidebar";
+import apiConfig from "../../api-config";
 
 interface SubscriptionList {
   id: string;
@@ -41,9 +42,12 @@ const SubscriptionListPage = () => {
         return;
       }
 
-      const response = await axios.get("http://localhost:8000/api/subscription-lists", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.get(
+        `${apiConfig.apiUrl}/subscription-lists`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       setSubscriptionLists(response.data.subscription_lists);
     } catch (error) {
@@ -55,7 +59,9 @@ const SubscriptionListPage = () => {
   };
 
   const handleDelete = async (id: string) => {
-    const confirmed = confirm("Are you sure you want to delete this subscription list?");
+    const confirmed = confirm(
+      "Are you sure you want to delete this subscription list?"
+    );
     if (!confirmed) return;
 
     try {
@@ -65,7 +71,7 @@ const SubscriptionListPage = () => {
         return;
       }
 
-      await axios.delete(`http://localhost:8000/api/subscription-lists/${id}`, {
+      await axios.delete(`${apiConfig.apiUrl}/subscription-lists/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -97,7 +103,7 @@ const SubscriptionListPage = () => {
       }
 
       await axios.put(
-        `http://localhost:8000/api/subscription-lists/${editingListId}`,
+        `${apiConfig.apiUrl}/subscription-lists/${editingListId}`,
         editSubscriptionList,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -125,9 +131,13 @@ const SubscriptionListPage = () => {
         return;
       }
 
-      const response = await axios.post("http://localhost:8000/api/subscription-list/create", newList, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.post(
+        `${apiConfig.apiUrl}/subscription-list/create`,
+        newList,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       setSubscriptionLists((prev) => [...prev, response.data.subscription_list]);
       setShowAddForm(false);

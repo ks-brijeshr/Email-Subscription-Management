@@ -12,6 +12,7 @@ use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\SubscriberController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\CustomEmailController;
+use App\Http\Controllers\EmailTemplateController;
 use App\Http\Controllers\UnsubscribeController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\SubscriberListController;
@@ -19,7 +20,8 @@ use App\Http\Controllers\SignupAnalyticsController;
 use App\Http\Controllers\SubscriptionListController;
 use App\Http\Controllers\SubscriptionAnalyticsController;
 use App\Http\Controllers\EmailVerificationStatsController;
-
+use App\Http\Controllers\sendTemplateToSubscribers;
+use App\Http\Controllers\NotificationController;
 
 Route::get('/test', function () {
     return response()->json(['message' => 'Hey this new API is working!']);
@@ -159,7 +161,6 @@ Route::middleware(['auth:sanctum', 'rate.limit'])->group(function () {
     Route::post('/subscriptions/{list_id}/subscribers', [SubscriberController::class, 'addSubscriber']);
     Route::put('/subscribers/{subscriber_id}/status', [SubscriberController::class, 'updateSubscriberStatus']);
     Route::get('/subscriber/{subscriber_id}', [SubscriberController::class, 'getSubscriberDetails']);
-
 });
 
 //Add subscriber tags
@@ -219,3 +220,22 @@ Route::post('/subscriptions/{list_id}/import', [SubscriberController::class, 'im
 
 //userside subscriber add
 Route::post('/subscribe', [NewsletterController::class, 'subscribe']);
+
+
+
+Route::middleware('auth:sanctum')->group(function () {
+    // List all email templates (default + user’s own)
+    Route::get('/email-templates', [EmailTemplateController::class, 'index']);
+
+    // View one template
+    Route::get('/email-templates/{id}', [EmailTemplateController::class, 'show']);
+
+    // Update template (user’s own only)
+    Route::put('/email-templates/{id}', [EmailTemplateController::class, 'update']);
+});
+
+
+Route::middleware('auth:sanctum')->post('/send-template', [sendTemplateToSubscribers::class, 'sendTemplateToSubscribers']);
+
+Route::middleware('auth:sanctum')->get('/notifications', [NotificationController::class, 'index']);
+Route::middleware('auth:sanctum')->put('/notifications/mark-as-read', [NotificationController::class, 'markAllAsRead']);

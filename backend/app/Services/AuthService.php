@@ -44,6 +44,7 @@ class AuthService
             'is_owner' => filter_var($data['is_owner'], FILTER_VALIDATE_BOOLEAN),
         ]);
 
+        // Increment daily signup count
         $date = Carbon::today()->toDateString();
         $signup = DailySignup::where('date', $date)->first();
 
@@ -56,19 +57,31 @@ class AuthService
             ]);
         }
 
-        // event(new Registered($user));
-
         // Dispatch queued verification email
         SendVerificationEmailJob::dispatch($user);
 
+        // Log initial verification attempt as failed (until user clicks link)
         EmailVerificationLog::create([
             'user_id' => $user->id,
             'status' => 'failed',
             'attempted_at' => now(),
         ]);
 
+        // Clone 4 default email templates for this user
+        $defaultTemplates = \App\Models\EmailTemplate::whereNull('user_id')->get();
+
+        foreach ($defaultTemplates as $template) {
+            \App\Models\EmailTemplate::create([
+                'user_id' => $user->id,
+                'name' => $template->name,
+                'subject' => $template->subject,
+                'body' => $template->body,
+            ]);
+        }
+
         return $user;
     }
+
 
 
 
